@@ -5,11 +5,11 @@ const sequelize = new Sequelize('lis_db', 'lis', 'lispass', {
 });
 
 const Specimen = require('./models/specimen')(sequelize);
-const Observation = require('./models/observation-request')(sequelize);
 const Result = require('./models/observation-results')(sequelize);
-Specimen.hasMany(Observation, { as: 'observations' });
-const observation = Result.belongsTo(Observation, { as: 'observation', foreignKey: 'observation_requests_id' });
-Observation.hasMany(Result);
+// const Observation = require('./models/observation-request')(sequelize);
+Specimen.hasMany(Result, { as: 'results' });
+// const observation = Result.belongsTo(Observation, { as: 'observation', foreignKey: 'observation_requests_id' });
+// Observation.hasMany(Result);
 sequelize.sync();
 
 const getSpecimen = (spm) => Specimen.findOne({
@@ -33,21 +33,19 @@ const createAllObr = async (spm, jsonData) => {
       break;
     }
 
-    const observ = await Observation.findOne({ where: { specimen_id: spm.id,  service_identifier_id: obr.service_identifier_id } })
+    const obx = jsonData[`OBX${postfix}`]
+    const result = await Result.findOne({ where: { specimen_id: spm.id,  identifier: obx.identifier } })
     // console.log('Observation:', observ);
-    if (observ === null) {
-      const obx = jsonData[`OBX${postfix}`]
+    if (result === null) {
       Result.create({
         ...obx,
-        observation: {
-          ...obr,
-          specimen_id: spm.id,
-        },
-      }, {
-        include: [ observation ]
+        date_time: Date(obx.date_time),
+        specimen_id: spm.id,
+      }).then(() => {
+        console.log(`Observation Result Created: [${spm.specimen_id}] -> ${obx.identifier}`);
       })
     } else {
-      console.log('Observation Exists:', obr.service_identifier_id);
+      console.log(`Observation Result Exists: [${spm.specimen_id}] -> ${obx.identifier}`);
     }
     index++;
   }

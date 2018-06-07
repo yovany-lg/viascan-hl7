@@ -19,11 +19,10 @@ exports.ORC = {
 };
 
 exports.OBX = {
-    1: 'set_id',
     2: 'value_type',
-    '3.1': 'observation_identifier_id',
-    '3.2': 'observation_identifier_text',
-    '3.3': 'observation_identifier_coding_system',
+    '3.1': 'identifier',
+    '3.2': 'identifier_text',
+    '3.3': 'identifier_coding_system',
     5: 'value',
     '6.1': 'unit_identifier',
     '6.2': 'unit_text',

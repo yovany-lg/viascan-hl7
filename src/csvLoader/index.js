@@ -9,11 +9,11 @@ const sequelize = new Sequelize('lis_db', 'lis', 'lispass', {
 });
 
 const Specimen = require('../dbConnect/models/specimen')(sequelize);
-const Observation = require('../dbConnect/models/observation-request')(sequelize);
+// const Observation = require('../dbConnect/models/observation-request')(sequelize);
 const Result = require('../dbConnect/models/observation-results')(sequelize);
-Specimen.hasMany(Observation, { as: 'observations' });
-const observation = Result.belongsTo(Observation, { as: 'observation', foreignKey: 'observation_requests_id' });
-Observation.hasMany(Result);
+Specimen.hasMany(Result, { as: 'results' });
+// const observation = Result.belongsTo(Observation, { as: 'observation', foreignKey: 'observation_requests_id' });
+// Observation.hasMany(Result);
 sequelize.sync();
 
 const getSpecimen = (spm) => Specimen.findOne({
@@ -37,23 +37,19 @@ const saveSpecimenData = async (data) => {
   await Promise.all(data.map(async (row) => {
     // console.log('DATE!:', Date(row[8]));
     await Result.create({
-      observation_identifier_id: row[2],
-      observation_identifier_text: row[2],
+      identifier: row[2],
+      identifier_text: row[2],
       value: row[4],
       unit_identifier: row[5],
       abnormal_flags: row[6],
       references_range: row[7],
       date_time: Date(row[8]),
-      observation: {
-        service_identifier_id: row[2],
-        service_identifier_text: row[2],
-        specimen_id: specimen.id,
-      },
-    }, {
-      include: [ observation ]
+      specimen_id: specimen.id,
     })
     return null;
-  }));
+  })).then(() => {
+    console.log('Migration ended...');
+  });
 }
 
 var parser = parse({delimiter: ','}, async (err, data) => {
@@ -109,7 +105,7 @@ var parser = parse({delimiter: ','}, async (err, data) => {
   //   }));
 });
 
-fs.createReadStream(__dirname+'../../../backups/AutomaticPatientsReport.csv').pipe(parser);
+fs.createReadStream(__dirname+'../../../backups/AutomaticPatientsReport2.csv').pipe(parser);
 
 // const csvLoader = () => new Promise((resolve, reject) => {
 //   fs.createReadStream(__dirname+'../../../backups/AutomaticPatientsReport.csv')
