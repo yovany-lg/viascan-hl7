@@ -1,0 +1,21 @@
+{
+  "name": "lab-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "loader": "node src/csvLoader/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@rimiti/hl7-object-parser": "^2.7.0",
+    "csv-parse": "^2.4.0",
+    "eslint": "^4.19.1",
+    "mysql2": "^1.5.3",
+    "sequelize": "^4.37.8"
+  }
+}
